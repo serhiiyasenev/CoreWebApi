@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace FirstWebApplication.Authorization.Services
+namespace CoreWebApp.Authorization.Services
 {
     public class JwtServicecs
     {

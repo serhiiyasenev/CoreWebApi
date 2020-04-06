@@ -1,13 +1,14 @@
-﻿using FirstWebApplication.Models;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using CoreWebApp.Contexts;
+using CoreWebApp.Students.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
-namespace FirstWebApplication.Controllers
+namespace CoreWebApp.Teachers.Controllers
 {
     [Authorize]
     [Route("[controller]")]
@@ -27,7 +28,7 @@ namespace FirstWebApplication.Controllers
             try
             {
                 var students = await _context.Students.ToArrayAsync();
-                return new ObjectResult(students.OrderBy(s => s.Id));
+                return new ObjectResult(students.OrderBy(s => s.Name));
             }
             catch (Exception e)
             {
@@ -113,7 +114,7 @@ namespace FirstWebApplication.Controllers
                 }
                 _context.Students.Remove(student);
                 await _context.SaveChangesAsync();
-                return Ok(student.Id);
+                return Ok(student.Name);
             }
             catch (Exception e)
             {

@@ -1,8 +1,11 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using FirstWebApplication.Authorization.Models;
-using FirstWebApplication.Models;
+using CoreWebApp.Authorization.Models;
+using CoreWebApp.Contexts;
+using CoreWebApp.Entities;
+using CoreWebApp.Students.Models;
+using CoreWebApp.Teachers.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -56,7 +59,7 @@ namespace CoreWebApp
 
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, DatabaseContext dbContext)
         {
             app.UseRouting();
 
@@ -105,6 +108,44 @@ namespace CoreWebApp
 
                 endpoints.MapControllers();
             });
+
+            //Examples(dbContext);
+
+
+        }
+
+        private void Examples(DatabaseContext dbContext)
+        {
+            var mathTeacher = new TeacherEntity
+            {
+                Name = "Dawson",
+                Discipline = "Math"
+            };
+
+            var alex = new StudentEntity
+            {
+                Name = "Alex",
+                Score = 99
+            };
+
+            var oleg = new StudentEntity
+            {
+                Name = "Oleg",
+                Score = 98
+            };
+
+
+            dbContext.AddRange(alex, oleg, mathTeacher);
+
+
+            mathTeacher.Students = new[]
+            {
+                new StudentTeacherEntity {Teacher = mathTeacher, Student = alex},
+                new StudentTeacherEntity {Teacher = mathTeacher, Student = oleg}
+
+            };
+
+            dbContext.SaveChanges();
         }
     }
 }

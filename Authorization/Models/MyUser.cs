@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace FirstWebApplication.Authorization.Models
+namespace CoreWebApp.Authorization.Models
 {
     public class MyUser : IdentityUser
     {

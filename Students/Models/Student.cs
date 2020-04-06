@@ -1,10 +1,14 @@
-﻿namespace FirstWebApplication.Models
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using CoreWebApp.Teachers.Models;
+
+namespace CoreWebApp.Students.Models
 {
     public class Student
     {
-        public int    Id      { get; set; }
-        public string Name    { get; set; }
+        [Key]
+        public string Name { get; set; }
         public int    Score   { get; set; }
-        public Teacher Teacher { get; set;}
+        public IEnumerable<Teacher>  Teachers { get; set;}
     }
 }

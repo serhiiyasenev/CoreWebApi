@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FirstWebApplication.Models
+namespace CoreWebApp.Teachers.Models
 {
     public class Teacher
     {

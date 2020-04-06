@@ -2,12 +2,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
-using FirstWebApplication.Authorization.Models;
+using CoreWebApp.Authorization.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FirstWebApplication.Authorization.Controllers
+namespace CoreWebApp.Authorization.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

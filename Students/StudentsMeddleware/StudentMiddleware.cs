@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Linq;
-using System.Threading.Tasks;
-using FirstWebApplication.Models;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using CoreWebApp.Contexts;
+using CoreWebApp.Students.Models;
+using CoreWebApp.Teachers.Models;
+using Microsoft.AspNetCore.Http;
 
-namespace FirstWebApplication.StudentsMeddleware
+namespace CoreWebApp.Students.StudentsMeddleware
 {
     public class StudentMiddleware
     {
@@ -22,9 +24,12 @@ namespace FirstWebApplication.StudentsMeddleware
             {
                 var query = context.Request.QueryString.Value.Substring(1);
 
-                var dict = query.Split('&')
-                    .Select(s => s.Split('='))
-                    .ToDictionary(s => s[0], s => s[1]);
+                var dict = new Dictionary<string, string>();
+                foreach (var s in query.Split('&'))
+                {
+                    var strings = s.Split('=');
+                    dict.Add(strings[0], strings[1]);
+                }
 
                 if (!dict.ContainsKey("name") ||
                     !dict.ContainsKey("score"))
@@ -34,18 +39,18 @@ namespace FirstWebApplication.StudentsMeddleware
 
                 if (dict.ContainsKey("teacherName"))
                 {
-                    student.Teacher = new Teacher
+                    student.Teachers = new[] {new Teacher
                     {
                         Name = dict["teacherName"],
                         Discipline = dict.ContainsKey("discipline") ? dict["discipline"] : null
-                    };
+                    }};
                 }
 
                 var entity = dbContext.Students.Add(student);
 
                 await dbContext.SaveChangesAsync();
 
-                await context.Response.WriteAsync(entity.Entity.Id.ToString());
+                await context.Response.WriteAsync(entity.Entity.Name);
             }
             else
             {
