@@ -1,16 +1,16 @@
-﻿using System;
+﻿using CoreWebApp.Contexts;
+using CoreWebApp.Students.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreWebApp.Contexts;
-using CoreWebApp.Students.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CoreWebApp.Students.Controllers
 {
     //[Authorize]
+    [ApiController]
     [Route("[controller]")]
    
     public class StudentController : ControllerBase
@@ -27,7 +27,7 @@ namespace CoreWebApp.Students.Controllers
         {
             try
             {
-                var students = await _context.Students.ToArrayAsync();
+                var students = await _context.Students.ToListAsync();
                 return new ObjectResult(students.OrderBy(s => s.Name));
             }
             catch (Exception e)

@@ -37,8 +37,6 @@ D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\System.Configuration.Configur
 D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll
 D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\System.Security.Cryptography.ProtectedData.dll
 D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.csproj.CoreCompileInputs.cache
-D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.MvcApplicationPartsAssemblyInfo.cache
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.AssemblyInfoInputs.cache
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.AssemblyInfo.cs
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.RazorTargetAssemblyInfo.cache
@@ -48,3 +46,14 @@ D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\staticwebassets\CoreWebApp.St
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.dll
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.pdb
 D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.genruntimeconfig.cache
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\EntityFramework.SqlServer.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\EntityFramework.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\System.CodeDom.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\System.Data.SqlClient.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\sni.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\sni.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\sni.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\!!!_Net_2020\CoreWebApi\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.csproj.CoreCompileInputs.cache
+D:\!!!_Net_2020\CoreWebApi\obj\Debug\netcoreapp3.1\CoreWebApp.MvcApplicationPartsAssemblyInfo.cache

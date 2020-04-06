@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace CoreWebApp.Teachers.Controllers
 {
     [Authorize]
+    [ApiController]
     [Route("[controller]")]
-   
     public class TeacherController : ControllerBase
     {
         private readonly DatabaseContext _context;

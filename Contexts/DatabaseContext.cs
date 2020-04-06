@@ -26,13 +26,16 @@ namespace CoreWebApp.Contexts
             base.OnModelCreating(builder);
 
             builder.Entity<StudentTeacherEntity>()
-                .HasKey(st => new {st.StudentId, st.TeacherId});
-
+                .HasKey(entity => new
+                {
+                    StudentId        = entity.StudentId,
+                    TeacherId        = entity.TeacherId
+                });
 
             builder.Entity<StudentTeacherEntity>()
-                .HasOne(st => st.Student)
-                .WithMany(st => st.Teachers)
-                .HasForeignKey(st => st.StudentId);
+                    .HasOne(st => st.Student)
+                    .WithMany(st => st.Teachers)
+                    .HasForeignKey(st => st.StudentId);
 
             builder.Entity<StudentTeacherEntity>()
                 .HasOne(st => st.Teacher)

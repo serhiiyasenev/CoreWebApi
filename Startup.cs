@@ -4,8 +4,6 @@ using System.IO;
 using CoreWebApp.Authorization.Models;
 using CoreWebApp.Contexts;
 using CoreWebApp.Entities;
-using CoreWebApp.Students.Models;
-using CoreWebApp.Teachers.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -68,9 +66,6 @@ namespace CoreWebApp
 
             app.UseStaticFiles();
 
-            //app.MapWhen(context => context.Request.Path.HasValue &&
-            //                       context.Request.Path.StartsWithSegments("/student/"),
-            //    a => a.UseMiddleware<StudentMiddleware>());
 
             app.MapWhen(context => context.Request.Path.HasValue &&
             context.Request.Path.Value.StartsWith("/static/"),
@@ -78,24 +73,27 @@ namespace CoreWebApp
             {
                 a.Run(async context =>
                 {
-                    var fileName = context.Request.Path.Value.Substring(8);
-
-                    Console.WriteLine($"Returning content path: {fileName}");
-
-                    var currentDirectory = Directory.GetCurrentDirectory();
-                    
-                    var filePathCombine = Path.Combine(currentDirectory, "Static", fileName);
-
-                    if (!File.Exists(filePathCombine))
+                    if (context.Request.Path.Value != null)
                     {
-                        return;
+                        var fileName = context.Request.Path.Value.Substring(8);
+
+                        Console.WriteLine($"Returning content path: {fileName}");
+
+                        var currentDirectory = Directory.GetCurrentDirectory();
+                    
+                        var filePathCombine = Path.Combine(currentDirectory, "Static", fileName);
+
+                        if (!File.Exists(filePathCombine))
+                        {
+                            return;
+                        }
+
+                        var file = await File.ReadAllBytesAsync(filePathCombine);
+
+                        Console.WriteLine($"Returning content file length: {file.Length}");
+
+                        await context.Response.Body.WriteAsync(file);
                     }
-
-                    var file = await File.ReadAllBytesAsync(filePathCombine);
-
-                    Console.WriteLine($"Returning content file length: {file.Length}");
-
-                    await context.Response.Body.WriteAsync(file);
                 });
             });
 
@@ -116,32 +114,32 @@ namespace CoreWebApp
 
         private void Examples(DatabaseContext dbContext)
         {
-            var mathTeacher = new TeacherEntity
+            var chemistryTeacher = new TeacherEntity
             {
-                Name = "Dawson",
-                Discipline = "Math"
+                Name = "Ivan",
+                Discipline = "Chemistry"
             };
 
-            var alex = new StudentEntity
+            var serhii = new StudentEntity
             {
-                Name = "Alex",
+                Name = "Serhii",
                 Score = 99
             };
 
-            var oleg = new StudentEntity
+            var petro = new StudentEntity
             {
-                Name = "Oleg",
+                Name = "Petro",
                 Score = 98
             };
 
 
-            dbContext.AddRange(alex, oleg, mathTeacher);
+            dbContext.AddRange(serhii, petro, chemistryTeacher);
 
 
-            mathTeacher.Students = new[]
+            chemistryTeacher.Students = new[]
             {
-                new StudentTeacherEntity {Teacher = mathTeacher, Student = alex},
-                new StudentTeacherEntity {Teacher = mathTeacher, Student = oleg}
+                new StudentTeacherEntity {Teacher = chemistryTeacher, Student = serhii},
+                new StudentTeacherEntity {Teacher = chemistryTeacher, Student = petro}
 
             };
 
