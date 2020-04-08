@@ -37,7 +37,7 @@ namespace StudentsApi.Students.Controllers
 
                 // if we include teachers, then there is a loop because teachers have a link to students
 
-                return new ObjectResult(students);
+                return new ObjectResult(students.OrderBy(s => s.Id));
             }
             catch (Exception e)
             {
@@ -76,7 +76,7 @@ namespace StudentsApi.Students.Controllers
         {
             try
             {
-                if (model.Score.IsScoreAcceptable().Item1)
+                if (!model.Score.IsScoreAcceptable().Item1)
                 {
                     return BadRequest(model.Score.IsScoreAcceptable().Item2);
                 }
@@ -121,7 +121,7 @@ namespace StudentsApi.Students.Controllers
                     return NotFound();
                 }
 
-                if (model.Score.IsScoreAcceptable().Item1)
+                if (!model.Score.IsScoreAcceptable().Item1)
                 {
                     return BadRequest(model.Score.IsScoreAcceptable().Item2);
                 }
@@ -154,7 +154,7 @@ namespace StudentsApi.Students.Controllers
                     return NotFound();
                 }
         
-                if (score.IsScoreAcceptable().Item1)
+                if (!score.IsScoreAcceptable().Item1)
                 {
                     return BadRequest(score.IsScoreAcceptable().Item2);
                 }
@@ -183,6 +183,7 @@ namespace StudentsApi.Students.Controllers
                 {
                     return NotFound();
                 }
+
                 _dbContext.Students.Remove(student);
 
                 await _dbContext.SaveChangesAsync();

@@ -7,8 +7,7 @@ namespace StudentsApi.Teachers.Models
     {
         public string Name       { get; set;}
         public string Discipline { get; set;}
-
-        public IEnumerable<StudentModel> Students { get; set; }
+        public List<StudentModel> Students { get; set; }
 
     }
 }
