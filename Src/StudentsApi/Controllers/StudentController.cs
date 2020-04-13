@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentsApi.Contexts;
 using StudentsApi.Entities;
-using StudentsApi.Students.Models;
+using StudentsApi.Helpers;
+using StudentsApi.Models;
 
-namespace StudentsApi.Students.Controllers
+namespace StudentsApi.Controllers
 {
     //[Authorize]
     [ApiController]
@@ -29,15 +29,33 @@ namespace StudentsApi.Students.Controllers
         {
             try
             {
+                var studentEntities = await _dbContext.Students.AsNoTracking()
+                                                    .Include(t => t.Group)
+                                                    .ThenInclude(g => g.GroupName)
+                                                    .ToListAsync();
 
-                StudentEntity[] students = await _dbContext.Students.AsNoTracking()
-                                                    //.Include(t => t.Teachers)
-                                                    //.ThenInclude(st => st.Teacher)
-                                                    .ToArrayAsync();
+                var students = new List<StudentModel>();
 
-                // if we include teachers, then there is a loop because teachers have a link to students
+                foreach (var entity in studentEntities)
+                {
+                    var student = new StudentModel
+                    {
+                        StudentName = entity.StudentName, 
+                        AvrScore = entity.AvrScore, 
+                       GroupName = entity.Group.GroupName
+                    };
+                    
+                    students.Add(student);
+                }
 
-                return new ObjectResult(students.OrderBy(s => s.Id));
+                var jsonModel = JsonHelper.FromObjectToJson(students);
+
+
+                List<StudentModel> test = JsonHelper.FromJsonToObject<List<StudentModel>>(jsonModel);
+
+                string test2 = JsonHelper.FromObjectToJson(jsonModel);
+
+                return new ObjectResult(jsonModel);
             }
             catch (Exception e)
             {
@@ -50,20 +68,29 @@ namespace StudentsApi.Students.Controllers
         {
             try
             {
-                // if we include teachers, then there is a cycle because teachers have a link to students
-
-                var student = await _dbContext.Students.AsNoTracking()
-                    //.Include(t => t.Teachers)
-                    //.ThenInclude(st => st.Teacher.Discipline)
-                    .FirstOrDefaultAsync(st => st.Id.Equals(id));
+                var entity = await _dbContext.Students.AsNoTracking()
+                    .Include(t => t.Group)
+                    .ThenInclude(g => g.GroupName)
+                    .FirstOrDefaultAsync(st => st.StudentId.Equals(id));
 
 
-                if (student == null)
+                if (entity == null)
                 {
                     return NotFound();
                 }
 
-                return new ObjectResult(student);
+                var student = new StudentModel
+                {
+                    StudentName = entity.StudentName,
+                    AvrScore = entity.AvrScore,
+                    Course = entity.Group.Course,
+                    GroupName = entity.Group.GroupName
+                };
+
+
+                var json = JsonHelper.FromObjectToJson(student);
+
+                return new ObjectResult(json);
             }
             catch (Exception e)
             {
@@ -76,27 +103,23 @@ namespace StudentsApi.Students.Controllers
         {
             try
             {
-                if (!model.Score.IsScoreAcceptable().Item1)
+                if (!model.AvrScore.IsScoreAcceptable().Item1)
                 {
-                    return BadRequest(model.Score.IsScoreAcceptable().Item2);
+                    return BadRequest(model.AvrScore.IsScoreAcceptable().Item2);
                 }
 
-                var teachers = new List<StudentTeacherEntity>();
-
-                foreach (var item in model.Teachers)
-                {
-                    teachers.Add(new StudentTeacherEntity
-                    {
-                        Teacher = new TeacherEntity
-                        {
-                            Name = item.Name,
-                            Discipline = item.Discipline
-                        }
-                    });
-                }
 
                 var student = _dbContext.Students
-                    .Add(new StudentEntity { Name = model.Name, Score = model.Score, Teachers = teachers });
+                    .Add(new StudentEntity
+                    {
+                        StudentName = model.StudentName, 
+                        AvrScore = model.AvrScore, 
+                        Group = new GroupEntity
+                        {
+                            GroupName = model.GroupName,
+                            Course = model.Course
+                        }
+                    });
                 
                 await _dbContext.SaveChangesAsync();
                 
@@ -121,14 +144,14 @@ namespace StudentsApi.Students.Controllers
                     return NotFound();
                 }
 
-                if (!model.Score.IsScoreAcceptable().Item1)
+                if (!model.AvrScore.IsScoreAcceptable().Item1)
                 {
-                    return BadRequest(model.Score.IsScoreAcceptable().Item2);
+                    return BadRequest(model.AvrScore.IsScoreAcceptable().Item2);
                 }
 
-                student.Score = model.Score;
+                student.AvrScore = model.AvrScore;
 
-                student.Name = model.Name;
+                student.StudentName = model.StudentName;
 
 
                 await _dbContext.SaveChangesAsync();
@@ -159,7 +182,7 @@ namespace StudentsApi.Students.Controllers
                     return BadRequest(score.IsScoreAcceptable().Item2);
                 }
         
-                student.Score = score;
+                student.AvrScore = score;
         
                 await _dbContext.SaveChangesAsync();
         
@@ -188,7 +211,7 @@ namespace StudentsApi.Students.Controllers
 
                 await _dbContext.SaveChangesAsync();
 
-                return Ok($"Student with id {student.Id} and name {student.Name} was deleted");
+                return Ok($"Student with id {student.StudentId} and name {student.StudentName} was deleted");
             }
             catch (Exception e)
             {

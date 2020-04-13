@@ -27,10 +27,13 @@ namespace StudentsApi
             services.AddMvc();
             services.AddControllers();
 
+            //services.AddDbContext<StudentsDbContext>(options =>
+            //{
+            //    options.UseNpgsql(_configuration.GetConnectionString("MyConnectionString"));
+            //});
+
             services.AddDbContext<StudentsDbContext>(options =>
-            {
-                options.UseNpgsql(_configuration.GetConnectionString("MyConnectionString"));
-            });
+                options.UseSqlServer(_configuration.GetConnectionString("MyConnectionString")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, StudentsDbContext dbContext)
@@ -91,7 +94,7 @@ namespace StudentsApi
 
             dbContext.Database.Migrate();
 
-            //Examples(dbContext);
+            Examples(dbContext);
 
 
         }
@@ -100,32 +103,49 @@ namespace StudentsApi
         {
             var chemistryTeacher = new TeacherEntity
             {
-                Name = "Ivan",
+                TeacherName = "Ivan",
                 Discipline = "Chemistry"
+            };
+
+            var mathTeacher = new TeacherEntity
+            {
+                TeacherName = "David",
+                Discipline = "Math"
+            };
+
+            var teachers = new List<TeacherEntity>
+            {
+                chemistryTeacher,
+                mathTeacher
             };
 
             var serhii = new StudentEntity
             {
-                Name = "Serhii",
-                Score = 99
+                StudentName = "Serhii",
+                AvrScore = 99
             };
 
             var petro = new StudentEntity
             {
-                Name = "Petro",
-                Score = 98
+                StudentName = "Petro",
+                AvrScore = 98
             };
 
 
-            dbContext.AddRange(serhii, petro, chemistryTeacher);
-
-
-            chemistryTeacher.Students = new List<StudentTeacherEntity>
+            var students = new List<StudentEntity>
             {
-                new StudentTeacherEntity {Teacher = chemistryTeacher, Student = serhii},
-                new StudentTeacherEntity {Teacher = chemistryTeacher, Student = petro}
+                serhii,
+                petro
+            };
+
+
+            var group = new List<GroupEntity>
+            {
+                new GroupEntity {Teachers = teachers, Students = students}
 
             };
+
+            dbContext.AddRange(teachers, students, group);
 
             dbContext.SaveChanges();
         }
