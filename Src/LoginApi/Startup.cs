@@ -30,9 +30,8 @@ namespace LoginApi
             services.AddControllers();
 
             services.AddDbContext<LoginDbContext>(options =>
-            {
-                options.UseNpgsql(_configuration.GetConnectionString("MyConnectionString"));
-            });
+                options.UseSqlServer(_configuration.GetConnectionString("MyConnectionString")));
+
 
             services.Configure<IdentityOptions>(options =>
                                                 {
@@ -83,11 +82,14 @@ namespace LoginApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Hello IdentityOptions!");
+                    await context.Response.WriteAsync("Hello LoginApi!");
                 });
                 endpoints.MapControllers();
             });

@@ -13,8 +13,8 @@ namespace StudentsApi.Controllers
 {
     //[Authorize]
     [ApiController]
-    [Route("api/[controller]")]
-   
+    [Route("api/student")]
+
     public class StudentController : ControllerBase
     {
         private readonly StudentsDbContext _dbContext;
@@ -24,53 +24,52 @@ namespace StudentsApi.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet]
+        [HttpGet(Name = nameof(GetAllStudents))]
         public async Task<IActionResult> GetAllStudents()
         {
             try
             {
                 var studentEntities = await _dbContext.Students.AsNoTracking()
-                                                    .Include(t => t.Group)
-                                                    .ThenInclude(g => g.GroupName)
+                                                    .Include(d => d.Disciplines)
+                                                    .ThenInclude(n => n.DisciplineName)
                                                     .ToListAsync();
 
-                var students = new List<StudentModel>();
-
-                foreach (var entity in studentEntities)
-                {
-                    var student = new StudentModel
+                var students = (from entity in studentEntities 
+                    let disciplines = entity.Disciplines
+                        .Select(discipline => new DisciplineModel
+                        {
+                            DisciplineName = discipline.DisciplineName
+                        }).ToList() 
+                    select new StudentModel
                     {
                         StudentName = entity.StudentName, 
-                        AvrScore = entity.AvrScore, 
-                       GroupName = entity.Group.GroupName
-                    };
-                    
-                    students.Add(student);
-                }
+                        Disciplines = disciplines
+                    }).ToList();
+
 
                 var jsonModel = JsonHelper.FromObjectToJson(students);
 
 
-                List<StudentModel> test = JsonHelper.FromJsonToObject<List<StudentModel>>(jsonModel);
+                var test = JsonHelper.FromJsonToObject<List<StudentModel>>(jsonModel);
 
-                string test2 = JsonHelper.FromObjectToJson(jsonModel);
+                var test2 = JsonHelper.FromObjectToJson(jsonModel);
 
                 return new ObjectResult(jsonModel);
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest("Wrong request: " + e.InnerException);
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = nameof(GetStudentById))]
         public async Task<IActionResult> GetStudentById(int id)
         {
             try
             {
                 var entity = await _dbContext.Students.AsNoTracking()
-                    .Include(t => t.Group)
-                    .ThenInclude(g => g.GroupName)
+                    .Include(d => d.Disciplines)
+                    .ThenInclude(n => n.DisciplineName)
                     .FirstOrDefaultAsync(st => st.StudentId.Equals(id));
 
 
@@ -79,12 +78,21 @@ namespace StudentsApi.Controllers
                     return NotFound();
                 }
 
+                var disciplines = new List<DisciplineModel>();
+
+                foreach (var discipline in entity.Disciplines)
+                {
+                    disciplines.Add(new DisciplineModel
+                    {
+                        DisciplineName = discipline.DisciplineName
+                    });
+                }
+
                 var student = new StudentModel
                 {
+                    StudentId = entity.StudentId,
                     StudentName = entity.StudentName,
-                    AvrScore = entity.AvrScore,
-                    Course = entity.Group.Course,
-                    GroupName = entity.Group.GroupName
+                    Disciplines = disciplines
                 };
 
 
@@ -94,31 +102,33 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest("Wrong request: " + e.InnerException);
             }
         }
 
-        [HttpPost]
+        [HttpPost(Name = nameof(CreateStudent))]
         public async Task<IActionResult> CreateStudent([FromBody] StudentModel model)
         {
             try
             {
-                if (!model.AvrScore.IsScoreAcceptable().Item1)
+                if (model == null)
                 {
-                    return BadRequest(model.AvrScore.IsScoreAcceptable().Item2);
+                    return BadRequest();
                 }
 
-
-                var student = _dbContext.Students
-                    .Add(new StudentEntity
-                    {
-                        StudentName = model.StudentName, 
-                        AvrScore = model.AvrScore, 
-                        Group = new GroupEntity
+                var disciplines = model.Disciplines
+                    .Select(d =>
+                        new DisciplineEntity
                         {
-                            GroupName = model.GroupName,
-                            Course = model.Course
-                        }
+                            DisciplineName = d.DisciplineName
+                        }).ToList();
+
+
+                var student = _dbContext.Students.Add(
+                    new StudentEntity
+                    {
+                        StudentName = model.StudentName,
+                        Disciplines = disciplines
                     });
                 
                 await _dbContext.SaveChangesAsync();
@@ -127,75 +137,11 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest("Wrong request: " + e.InnerException);
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStudentById([FromQuery] int id,
-                                                           [FromBody] StudentModel model)
-        {
-            try
-            {
-                var student = await _dbContext.Students.FindAsync(id);
-
-                if (student == null)
-                {
-                    return NotFound();
-                }
-
-                if (!model.AvrScore.IsScoreAcceptable().Item1)
-                {
-                    return BadRequest(model.AvrScore.IsScoreAcceptable().Item2);
-                }
-
-                student.AvrScore = model.AvrScore;
-
-                student.StudentName = model.StudentName;
-
-
-                await _dbContext.SaveChangesAsync();
-
-                return Ok(student);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("Wrong request: " + e.Message);
-            }
-        }
-
-        [HttpPatch("{id:int}, {score:int}")]
-        public async Task<IActionResult> PatchScoreForStudentById([FromQuery] int id,
-                                                                  [FromQuery] int score)
-        {
-            try
-            {
-                var student = await _dbContext.Students.FindAsync(id);
-        
-                if (student == null)
-                {
-                    return NotFound();
-                }
-        
-                if (!score.IsScoreAcceptable().Item1)
-                {
-                    return BadRequest(score.IsScoreAcceptable().Item2);
-                }
-        
-                student.AvrScore = score;
-        
-                await _dbContext.SaveChangesAsync();
-        
-                return Ok(student);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("Wrong request: " + e.Message);
-            }
-        }
-
-        
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteStudentById))]
         public async Task<IActionResult> DeleteStudentById(int id)
         {
             try
@@ -215,7 +161,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest("Wrong request: " + e.InnerException);
             }
         }
     }

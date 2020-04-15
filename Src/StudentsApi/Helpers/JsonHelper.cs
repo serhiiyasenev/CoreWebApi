@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace StudentsApi.Helpers
 {
@@ -12,8 +15,19 @@ namespace StudentsApi.Helpers
         
         public static string FromObjectToJson(object content)
         {
-           var json = JsonConvert.SerializeObject(content);
-           return json;
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                NullValueHandling = NullValueHandling.Ignore
+            };
+
+            var serializedObject = JsonConvert.SerializeObject(content, Formatting.None, jsonSerializerSettings);
+            return serializedObject;
+        }
+
+        public static StringContent ToStringContent(object content)
+        {
+            return new StringContent(FromObjectToJson(content), Encoding.UTF8, "application/json");
         }
     }
 }

@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "endpoint": "/api/student",
+      "destination": {
+        "uri": "http://localhost:5001/api/student/",
+        "requiresAuthentication": "true"
+      }
+    },
+    {
+      "endpoint": "/api/student",
+      "destination": {
+        "uri": "http://localhost:5002/api/user/",
+        "requiresAuthentication": "true"
+      }
+    }
+  ],
+  "authenticationService": {
+    "uri": "http://localhost:5002/api/auth/"
+  }
+}
