@@ -1,14 +1,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using StudentsApi.Controllers;
+using StudentsApi.Entities;
 using StudentsApi.Helpers;
 using StudentsApi.Models;
 
@@ -20,6 +15,8 @@ namespace StudentsApiTest.IntegrationTests
         private StudentsApiWebFactory _factory;
         private HttpClient _client;
         private string _requestUri;
+        private StringContent _content;
+        private StudentModel _model;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -27,37 +24,52 @@ namespace StudentsApiTest.IntegrationTests
             _factory = new StudentsApiWebFactory();
             _client = _factory.CreateClient();
             _requestUri = "api/student";
-        }
 
-        [Test]
-        public async Task PostStudentModel_ReturnsResultIsOk()
-        {
-            
-            // Arrange
-
-            var disciplines = new List<DisciplineModel> {new DisciplineModel {DisciplineName = "Math"}};
-            var model = new StudentModel
+            _model = new StudentModel
             {
                 StudentName = "TestStudent1",
-                Disciplines = disciplines
+                Disciplines = new HashSet<DisciplineModel>
+                {
+                    new DisciplineModel
+                    {
+                        DisciplineName = "Math"
+                    },
+                    new DisciplineModel
+                    {
+                        DisciplineName = "Chemistry"
+                    }
+                }
             };
 
-            var content = JsonHelper.ToStringContent(model);
-
-
-            // Act
-
-            var result = await _client.PostAsync(_requestUri, content);
-
-
-            //Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            _content = JsonHelper.ToStringContent(_model);
         }
 
         [Test]
-        public async Task WhenNoTextIsPosted_ThenTheResultIsBadRequest()
+        public async Task PostStudentModel_ReturnsResultAndOk()
         {
-            var result = await _client.PostAsync("/sample", new StringContent(string.Empty));
-            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            // Act
+            var result = await _client.PostAsync(_requestUri, _content);
+            var response = JsonHelper.FromJsonToObject<StudentEntity>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync());
+
+            // Assert
+            Assert.True(response.StudentId != 0);
+            Assert.True(response.StudentId.ToString() != null);
+            Assert.AreEqual(response.StudentName, _model.StudentName);
+            Assert.AreEqual(response.Disciplines, _model.Disciplines);
+        }
+
+        [Test]
+        public async Task GetStudentModel_ReturnsResultAndOk()
+        {
+            // Act
+            var result = await _client.GetAsync(_requestUri);
+            var response = JsonHelper.FromJsonToObject<StudentModel>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync());
+
+            // Assert
+            Assert.True(response.StudentId != 0);
+            Assert.True(response.StudentId.ToString() != null);
+            Assert.AreEqual(response.StudentName, _model.StudentName);
+            Assert.AreEqual(response.Disciplines, _model.Disciplines);
         }
 
         [OneTimeTearDown]

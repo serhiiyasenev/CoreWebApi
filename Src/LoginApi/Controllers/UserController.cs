@@ -10,11 +10,11 @@ namespace LoginApi.Controllers
     [Authorize]
     [ApiController]
     [Route("api/user")]
-    public class UserControllser : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly UserManager<MyUser> _userManager;
 
-        public UserControllser(UserManager<MyUser> user)
+        public UserController(UserManager<MyUser> user)
         {
             _userManager = user;
         }

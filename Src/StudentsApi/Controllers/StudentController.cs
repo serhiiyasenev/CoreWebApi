@@ -34,17 +34,18 @@ namespace StudentsApi.Controllers
                                                     .ThenInclude(n => n.DisciplineName)
                                                     .ToListAsync();
 
-                var students = (from entity in studentEntities 
-                    let disciplines = entity.Disciplines
-                        .Select(discipline => new DisciplineModel
-                        {
-                            DisciplineName = discipline.DisciplineName
-                        }).ToList() 
-                    select new StudentModel
+                var students = new List<StudentModel>();
+                foreach (var entity in studentEntities)
+                {
+                    HashSet<DisciplineModel> disciplines = entity.Disciplines.Select(discipline =>
+                        new DisciplineModel {DisciplineName = discipline.DisciplineName}).ToHashSet();
+
+                    students.Add(new StudentModel
                     {
-                        StudentName = entity.StudentName, 
+                        StudentName = entity.StudentName,
                         Disciplines = disciplines
-                    }).ToList();
+                    });
+                }
 
 
                 var jsonModel = JsonHelper.FromObjectToJson(students);
@@ -78,7 +79,7 @@ namespace StudentsApi.Controllers
                     return NotFound();
                 }
 
-                var disciplines = new List<DisciplineModel>();
+                HashSet<DisciplineModel> disciplines = new HashSet<DisciplineModel>();
 
                 foreach (var discipline in entity.Disciplines)
                 {
@@ -116,12 +117,12 @@ namespace StudentsApi.Controllers
                     return BadRequest();
                 }
 
-                var disciplines = model.Disciplines
+                HashSet<DisciplineEntity> disciplines = model.Disciplines
                     .Select(d =>
                         new DisciplineEntity
                         {
                             DisciplineName = d.DisciplineName
-                        }).ToList();
+                        }).ToHashSet();
 
 
                 var student = _dbContext.Students.Add(

@@ -53,7 +53,7 @@ namespace LoginApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest("Wrong request: " + e.InnerException);
             }
 
         }

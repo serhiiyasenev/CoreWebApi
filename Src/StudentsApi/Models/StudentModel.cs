@@ -5,8 +5,12 @@ namespace StudentsApi.Models
 {
     public class StudentModel
     {
+        public StudentModel()
+        {
+            Disciplines = new HashSet<DisciplineModel>();
+        }
         public int StudentId { get; set; }
         public string StudentName { get; set; }
-        public List<DisciplineModel> Disciplines { get; set; }
+        public HashSet<DisciplineModel> Disciplines { get; set; }
     }
 }

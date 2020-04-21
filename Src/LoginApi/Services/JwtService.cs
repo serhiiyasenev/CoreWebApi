@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using LoginApi.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,7 +21,7 @@ namespace LoginApi.Services
             _expirationSecond = Convert.ToDouble(_configuration.GetSection("JwtConfig" + ":ExpirationInSeconds").Value);
         }
 
-        public string GetToken(string username)
+        public TokenModel GetToken(string username)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -34,9 +35,16 @@ namespace LoginApi.Services
                                                         SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+            var accessToken = tokenHandler.WriteToken(tokenHandler.CreateJwtSecurityToken(tokenDescriptor));
 
-            return tokenHandler.WriteToken(token);
+            var token = new TokenModel
+            {
+                AccessToken = accessToken,
+                ExpiresInSeconds = (int) _expirationSecond,
+                TokenType = "Bearer"
+            };
+
+            return (token);
 
         }
     }

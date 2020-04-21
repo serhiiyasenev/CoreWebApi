@@ -7,9 +7,14 @@ namespace StudentsApi.Entities
     [Table(nameof(StudentEntity))]
     public class StudentEntity
     {
+        public StudentEntity()
+        {
+            Disciplines = new HashSet<DisciplineEntity>();
+        }
+
         [Key]
         public int StudentId         { get; set; }
         public string StudentName    { get; set; }
-        public List<DisciplineEntity> Disciplines { get; set; }
+        public HashSet<DisciplineEntity> Disciplines { get; set; }
     }
 }

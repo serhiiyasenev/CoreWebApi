@@ -1,0 +1,11 @@
+https://github.com/Vadim-Vorotilin/asp-net-core-course/blob/master/Lection7/Lection7/LoginApi/Controllers/LoginController.cs
+
+https://github.com/Vadim-Vorotilin/asp-net-core-course/tree/master/Lection7/Lection7
+
+
+https://habr.com/ru/post/419393/
+
+https://github.com/Vadim-Vorotilin/asp-net-core-course/blob/master/Lection12/Api.Tests/Integration/AccountControllerTests.cs
+
+
+https://medium.com/streamwriter/api-gateway-aspnet-core-a46ef259dc54

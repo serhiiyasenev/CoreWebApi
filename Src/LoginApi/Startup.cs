@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace LoginApi
 {
@@ -71,6 +72,13 @@ namespace LoginApi
                                           ValidateAudience = false
                                       };
                                   });
+
+            services.AddSwaggerGen(swagger =>
+            {
+                swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "Login API" });
+            });
+
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LoginDbContext dbContext)
@@ -95,6 +103,12 @@ namespace LoginApi
             });
 
             dbContext.Database.Migrate();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login API");
+            });
         }
     }
 }
