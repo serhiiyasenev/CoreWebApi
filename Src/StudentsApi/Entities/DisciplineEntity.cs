@@ -1,13 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace StudentsApi.Entities
+﻿namespace StudentsApi.Entities
 {
-    [Table(nameof(DisciplineEntity))]
     public class DisciplineEntity
     {
-        [Key]
-        public int DisciplineId { get; set; }
-        public string DisciplineName { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int StudentEntityId { get; set; }
     }
 }

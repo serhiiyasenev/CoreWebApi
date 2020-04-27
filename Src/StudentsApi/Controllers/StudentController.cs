@@ -31,31 +31,18 @@ namespace StudentsApi.Controllers
             {
                 var studentEntities = await _dbContext.Students.AsNoTracking()
                                                     .Include(d => d.Disciplines)
-                                                    .ThenInclude(n => n.DisciplineName)
                                                     .ToListAsync();
 
-                var students = new List<StudentModel>();
-                foreach (var entity in studentEntities)
+                var students = studentEntities.Select(entity 
+                => new StudentModel
                 {
-                    HashSet<DisciplineModel> disciplines = entity.Disciplines.Select(discipline =>
-                        new DisciplineModel {DisciplineName = discipline.DisciplineName}).ToHashSet();
+                    Name = entity.Name,
+                    Disciplines = entity.Disciplines.Select(d => d.Name).ToHashSet<string>()
+                }).ToList();
 
-                    students.Add(new StudentModel
-                    {
-                        StudentName = entity.StudentName,
-                        Disciplines = disciplines
-                    });
-                }
+                var outboundModel = JsonHelper.FromObjectToJson(students);
 
-
-                var jsonModel = JsonHelper.FromObjectToJson(students);
-
-
-                var test = JsonHelper.FromJsonToObject<List<StudentModel>>(jsonModel);
-
-                var test2 = JsonHelper.FromObjectToJson(jsonModel);
-
-                return new ObjectResult(jsonModel);
+                return new ObjectResult(outboundModel);
             }
             catch (Exception e)
             {
@@ -69,9 +56,8 @@ namespace StudentsApi.Controllers
             try
             {
                 var entity = await _dbContext.Students.AsNoTracking()
-                    .Include(d => d.Disciplines)
-                    .ThenInclude(n => n.DisciplineName)
-                    .FirstOrDefaultAsync(st => st.StudentId.Equals(id));
+                                                      .Include(d => d.Disciplines)
+                                                      .FirstOrDefaultAsync(st => st.Id.Equals(id));
 
 
                 if (entity == null)
@@ -79,27 +65,16 @@ namespace StudentsApi.Controllers
                     return NotFound();
                 }
 
-                HashSet<DisciplineModel> disciplines = new HashSet<DisciplineModel>();
-
-                foreach (var discipline in entity.Disciplines)
-                {
-                    disciplines.Add(new DisciplineModel
-                    {
-                        DisciplineName = discipline.DisciplineName
-                    });
-                }
-
                 var student = new StudentModel
                 {
-                    StudentId = entity.StudentId,
-                    StudentName = entity.StudentName,
-                    Disciplines = disciplines
+                    Name = entity.Name,
+                    Disciplines = entity.Disciplines.Select(d => d.Name).ToHashSet()
                 };
 
 
-                var json = JsonHelper.FromObjectToJson(student);
+                var outboundModel = JsonHelper.FromObjectToJson(student);
 
-                return new ObjectResult(json);
+                return new ObjectResult(outboundModel);
             }
             catch (Exception e)
             {
@@ -108,27 +83,27 @@ namespace StudentsApi.Controllers
         }
 
         [HttpPost(Name = nameof(CreateStudent))]
-        public async Task<IActionResult> CreateStudent([FromBody] StudentModel model)
+        public async Task<IActionResult> CreateStudent([FromBody] StudentModel inboundModel)
         {
             try
             {
-                if (model == null)
+                if (inboundModel == null)
                 {
                     return BadRequest();
                 }
 
-                HashSet<DisciplineEntity> disciplines = model.Disciplines
-                    .Select(d =>
-                        new DisciplineEntity
-                        {
-                            DisciplineName = d.DisciplineName
-                        }).ToHashSet();
+                var disciplines = new HashSet<DisciplineEntity>();
+
+                foreach (var d in inboundModel.Disciplines)
+                {
+                    disciplines.Add(new DisciplineEntity{ Name = d});
+                }
 
 
                 var student = _dbContext.Students.Add(
                     new StudentEntity
                     {
-                        StudentName = model.StudentName,
+                        Name = inboundModel.Name,
                         Disciplines = disciplines
                     });
                 
@@ -158,7 +133,7 @@ namespace StudentsApi.Controllers
 
                 await _dbContext.SaveChangesAsync();
 
-                return Ok($"Student with id {student.StudentId} and name {student.StudentName} was deleted");
+                return Ok($"Student with id {student.Id} and name {student.Name} was deleted");
             }
             catch (Exception e)
             {

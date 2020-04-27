@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -27,17 +27,11 @@ namespace StudentsApiTest.IntegrationTests
 
             _model = new StudentModel
             {
-                StudentName = "TestStudent1",
-                Disciplines = new HashSet<DisciplineModel>
+                Name = "TestStudent1",
+                Disciplines = new HashSet<string>
                 {
-                    new DisciplineModel
-                    {
-                        DisciplineName = "Math"
-                    },
-                    new DisciplineModel
-                    {
-                        DisciplineName = "Chemistry"
-                    }
+                    "Math",
+                    "Chemistry"
                 }
             };
 
@@ -49,13 +43,13 @@ namespace StudentsApiTest.IntegrationTests
         {
             // Act
             var result = await _client.PostAsync(_requestUri, _content);
-            var response = JsonHelper.FromJsonToObject<StudentEntity>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync());
+            var response = JsonHelper.FromJsonToObject<StudentEntity>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
 
             // Assert
-            Assert.True(response.StudentId != 0);
-            Assert.True(response.StudentId.ToString() != null);
-            Assert.AreEqual(response.StudentName, _model.StudentName);
-            Assert.AreEqual(response.Disciplines, _model.Disciplines);
+            Assert.True(response.Id != 0);
+            Assert.True(response.Id.ToString() != null);
+            Assert.AreEqual(response.Name, _model.Name);
+            Assert.AreEqual(response.Disciplines.Select(d => d.Name), _model.Disciplines);
         }
 
         [Test]
@@ -63,13 +57,11 @@ namespace StudentsApiTest.IntegrationTests
         {
             // Act
             var result = await _client.GetAsync(_requestUri);
-            var response = JsonHelper.FromJsonToObject<StudentModel>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync());
+            var response = JsonHelper.FromJsonToObject<List<StudentModel>>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
 
             // Assert
-            Assert.True(response.StudentId != 0);
-            Assert.True(response.StudentId.ToString() != null);
-            Assert.AreEqual(response.StudentName, _model.StudentName);
-            Assert.AreEqual(response.Disciplines, _model.Disciplines);
+            Assert.AreEqual(response.Last().Name, _model.Name);
+            Assert.AreEqual(response.Last().Disciplines, _model.Disciplines);
         }
 
         [OneTimeTearDown]

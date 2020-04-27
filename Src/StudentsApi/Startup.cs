@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StudentsApi.Contexts;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace StudentsApi
 {
@@ -39,6 +41,7 @@ namespace StudentsApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                dbContext.Database.Migrate();
             }
 
             app.UseRouting();
@@ -56,8 +59,6 @@ namespace StudentsApi
 
                 endpoints.MapControllers();
             });
-
-            dbContext.Database.Migrate();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

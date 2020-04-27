@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using Gateway.Routing;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -80,11 +80,11 @@ namespace Gateway
 
 
 
-            //Router router = new Router("routes.json");
+            var router = new Router("routes.json");
             app.Run(async (context) =>
             {
-                //var content = await router.RouteRequest(context.Request);
-                //await context.Response.WriteAsync(await content.Content.ReadAsStringAsync());
+                var content = await router.RouteRequest(context.Request);
+                await context.Response.WriteAsync(await content.Content.ReadAsStringAsync());
             });
 
         }
