@@ -8,17 +8,15 @@ namespace Gateway.Utils
     {
         public static T LoadFromFile<T>(string filePath)
         {
-            using (StreamReader reader = new StreamReader(filePath))
-            {
-                string json = reader.ReadToEnd();
-                T result = JsonConvert.DeserializeObject<T>(json);
-                return result;
-            }
+            using var reader = new StreamReader(filePath);
+            var json = reader.ReadToEnd();
+            var result = JsonConvert.DeserializeObject<T>(json);
+            return result;
         }
 
         public static T Deserialize<T>(object jsonObject)
         {
-            return JsonConvert.DeserializeObject<T>(Convert.ToString(jsonObject));
+            return JsonConvert.DeserializeObject<T>(Convert.ToString(jsonObject) ?? string.Empty);
         }
     }
 }

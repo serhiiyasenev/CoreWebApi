@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using LoginApi.Models;
+﻿using LoginApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace LoginApi.Controllers
 {
@@ -43,7 +43,7 @@ namespace LoginApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.Message);
+                return BadRequest($"Wrong request: '{e.Message}': {e.InnerException}");
             }
 
         }

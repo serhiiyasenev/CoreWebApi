@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Gateway.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Primitives;
-using Gateway.Utils;
 
 namespace Gateway.Routing
 {
@@ -27,8 +27,8 @@ namespace Gateway.Routing
 
         public async Task<HttpResponseMessage> RouteRequest(HttpRequest request)
         {
-            string path = request.Path.ToString();
-            string basePath = '/' + path.Split('/')[1];
+            var path = request.Path.ToString();
+            var basePath = '/' + path.Split('/')[1];
 
             Destination destination;
             try
@@ -44,7 +44,7 @@ namespace Gateway.Routing
             {
                 string token = request.Headers["token"];
                 request.Query.Append(new KeyValuePair<string, StringValues>("token", new StringValues(token)));
-                HttpResponseMessage authResponse = await AuthenticationService.SendRequest(request);
+                var authResponse = await AuthenticationService.SendRequest(request);
                 if (!authResponse.IsSuccessStatusCode) return ConstructErrorMessage("Authentication failed.");
             }
 
@@ -53,7 +53,7 @@ namespace Gateway.Routing
 
         private HttpResponseMessage ConstructErrorMessage(string error)
         {
-            HttpResponseMessage errorMessage = new HttpResponseMessage
+            var errorMessage = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.NotFound,
                 Content = new StringContent(error)

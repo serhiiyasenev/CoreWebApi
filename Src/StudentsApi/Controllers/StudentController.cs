@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentsApi.Contexts;
 using StudentsApi.Entities;
 using StudentsApi.Helpers;
 using StudentsApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentsApi.Controllers
 {
@@ -46,7 +46,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.InnerException);
+                return BadRequest($"Wrong request: {e.InnerException}");
             }
         }
 
@@ -78,7 +78,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.InnerException);
+                return BadRequest($"Wrong request: {e.InnerException}");
             }
         }
 
@@ -113,7 +113,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.InnerException);
+                return BadRequest($"Wrong request: {e.InnerException}");
             }
         }
 
@@ -137,7 +137,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.InnerException);
+                return BadRequest($"Wrong request: {e.InnerException}");
             }
         }
     }

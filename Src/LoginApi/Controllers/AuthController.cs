@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using LoginApi.Models;
+﻿using LoginApi.Models;
 using LoginApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LoginApi.Controllers
 {
@@ -53,7 +53,7 @@ namespace LoginApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Wrong request: " + e.InnerException);
+                return BadRequest($"Wrong request '{e.Message}': {e.InnerException}");
             }
 
         }

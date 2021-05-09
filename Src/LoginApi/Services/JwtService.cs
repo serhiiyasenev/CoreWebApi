@@ -1,10 +1,10 @@
-﻿using System;
+﻿using LoginApi.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using LoginApi.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LoginApi.Services
 {
@@ -12,13 +12,11 @@ namespace LoginApi.Services
     {
         private readonly byte[] _secret;
         private readonly double _expirationSecond;
-        private readonly IConfiguration _configuration;
 
         public JwtService(IConfiguration configuration)
         {
-            _configuration = configuration;
-            _secret = Encoding.ASCII.GetBytes(_configuration.GetSection("JwtConfig" + ":Secret").Value);
-            _expirationSecond = Convert.ToDouble(_configuration.GetSection("JwtConfig" + ":ExpirationInSeconds").Value);
+            _secret = Encoding.ASCII.GetBytes(configuration.GetSection("JwtConfig" + ":Secret").Value);
+            _expirationSecond = Convert.ToDouble(configuration.GetSection("JwtConfig" + ":ExpirationInSeconds").Value);
         }
 
         public TokenModel GetToken(string username)
@@ -26,13 +24,9 @@ namespace LoginApi.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("UserName", username)
-                }),
+                Subject = new ClaimsIdentity(new[] {new Claim("UserName", username)}),
                 Expires = DateTime.UtcNow.AddSeconds(_expirationSecond),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_secret), 
-                                                        SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var accessToken = tokenHandler.WriteToken(tokenHandler.CreateJwtSecurityToken(tokenDescriptor));
@@ -44,7 +38,7 @@ namespace LoginApi.Services
                 TokenType = "Bearer"
             };
 
-            return (token);
+            return token;
 
         }
     }
