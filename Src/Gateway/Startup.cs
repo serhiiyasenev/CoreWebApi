@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Gateway.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.IO;
 
 namespace Gateway
 {
@@ -46,7 +46,7 @@ namespace Gateway
                     {
                         if (context.Request.Path.Value != null)
                         {
-                            var fileName = context.Request.Path.Value.Substring(8);
+                            var fileName = context.Request.Path.Value[8..];
 
                             Console.WriteLine($"Returning content path: {fileName}");
 

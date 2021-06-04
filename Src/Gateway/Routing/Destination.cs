@@ -10,7 +10,7 @@ namespace Gateway.Routing
     {
         public string Path { get; set; }
         public bool RequiresAuthentication { get; set; }
-        static HttpClient client = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient();
 
         public Destination(string uri, bool requiresAuthentication)
         {
@@ -41,7 +41,7 @@ namespace Gateway.Routing
             {
                 Content = new StringContent(requestContent, Encoding.UTF8, request.ContentType)
             };
-            using var response = await client.SendAsync(newRequest);
+            using var response = await Client.SendAsync(newRequest);
             return response;
         }
 
@@ -51,7 +51,7 @@ namespace Gateway.Routing
             var queryString = request.QueryString.ToString();
 
             var endpoint = "";
-            var endpointSplit = requestPath.Substring(1).Split('/');
+            var endpointSplit = requestPath[1..].Split('/');
 
             if (endpointSplit.Length > 1)
                 endpoint = endpointSplit[1];

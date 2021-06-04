@@ -1,11 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using StudentsApi.Entities;
 using StudentsApi.Helpers;
 using StudentsApi.Models;
+using StudentsApiTest.Helpers;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace StudentsApiTest.IntegrationTests
 {
@@ -42,8 +43,8 @@ namespace StudentsApiTest.IntegrationTests
         public async Task PostStudentModel_ReturnsResultAndOk()
         {
             // Act
-            var result = await _client.PostAsync(_requestUri, _content);
-            var response = JsonHelper.FromJsonToObject<StudentEntity>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
+            var actualResult = await _client.PostAsync(_requestUri, _content);
+            var response = await actualResult.GetModelAsync<StudentEntity>();
 
             // Assert
             Assert.True(response.Id != 0);
