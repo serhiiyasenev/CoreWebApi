@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentsApi.Contexts;
 using StudentsApi.Entities;
-using StudentsApi.Helpers;
 using StudentsApi.Models;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request: {e.InnerException}");
+                return BadRequest($"Wrong request: {e.Message}");
             }
         }
 
@@ -78,7 +78,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request: {e.InnerException}");
+                return BadRequest($"Wrong request: {e.Message}");
             }
         }
 
@@ -113,7 +113,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request: {e.InnerException}");
+                return BadRequest($"Wrong request: {e.Message}");
             }
         }
 
@@ -137,7 +137,7 @@ namespace StudentsApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request: {e.InnerException}");
+                return BadRequest($"Wrong request: {e.Message}");
             }
         }
     }

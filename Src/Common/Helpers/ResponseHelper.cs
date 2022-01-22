@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace StudentsApiTest.Helpers
+namespace Common.Helpers
 {
     public static class ResponseHelper
     {

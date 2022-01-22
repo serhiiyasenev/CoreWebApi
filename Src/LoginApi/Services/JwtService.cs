@@ -5,6 +5,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static Common.Storages.StringStorage;
 
 namespace LoginApi.Services
 {
@@ -15,8 +16,8 @@ namespace LoginApi.Services
 
         public JwtService(IConfiguration configuration)
         {
-            _secret = Encoding.ASCII.GetBytes(configuration.GetSection("JwtConfig" + ":Secret").Value);
-            _expirationSecond = Convert.ToDouble(configuration.GetSection("JwtConfig" + ":ExpirationInSeconds").Value);
+            _secret = Encoding.ASCII.GetBytes(configuration.GetSection(SecretSectionName).Value);
+            _expirationSecond = Convert.ToDouble(configuration.GetSection(ExpirationSectionName).Value);
         }
 
         public TokenModel GetToken(string username)
@@ -39,7 +40,6 @@ namespace LoginApi.Services
             };
 
             return token;
-
         }
     }
 }

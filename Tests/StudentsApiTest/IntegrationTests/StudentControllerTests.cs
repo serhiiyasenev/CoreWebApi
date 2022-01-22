@@ -1,8 +1,7 @@
+using Common.Helpers;
 using NUnit.Framework;
 using StudentsApi.Entities;
-using StudentsApi.Helpers;
 using StudentsApi.Models;
-using StudentsApiTest.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;

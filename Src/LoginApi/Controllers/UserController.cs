@@ -20,9 +20,7 @@ namespace LoginApi.Controllers
         }
 
         [HttpPost("createUser", Name = nameof(CreateUser))]
-        public async Task<IActionResult> CreateUser([FromForm] string username,
-                                                    [FromForm] string lastName,
-                                                    [FromForm] string password)
+        public async Task<IActionResult> CreateUser([FromForm] string username, [FromForm] string lastName, [FromForm] string password)
         {
             try
             {
@@ -43,7 +41,7 @@ namespace LoginApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request: '{e.Message}': {e.InnerException}");
+                return BadRequest($"Wrong request: '{e.Message}': {e.InnerException}, {e.InnerException?.Message}");
             }
 
         }

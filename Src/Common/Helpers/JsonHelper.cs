@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 using System.Net.Http;
 using System.Text;
 
-namespace StudentsApi.Helpers
+namespace Common.Helpers
 {
     public static class JsonHelper
     {

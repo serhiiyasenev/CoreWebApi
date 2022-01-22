@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Gateway
 {
@@ -38,28 +39,30 @@ namespace Gateway
 
             app.UseStaticFiles();
 
-            app.MapWhen(context => context.Request.Path.HasValue &&
-                                   context.Request.Path.Value.StartsWith("/static/"),
-                a =>
-                {
-                    a.Run(async context =>
+            app.MapWhen(context => context.Request.Path.Value != null 
+                                   && context.Request.Path.HasValue 
+                                   && context.Request.Path.Value.StartsWith("/static/"),
+                appBuilder =>
+                { 
+                    appBuilder.Run(async context =>
                     {
                         if (context.Request.Path.Value != null)
                         {
-                            var fileName = context.Request.Path.Value[8..];
+                            var fileName = context.Request.Path.Value["/static/".Length..];
 
                             Console.WriteLine($"Returning content path: {fileName}");
 
-                            var currentDirectory = Directory.GetCurrentDirectory();
+                            var currentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Static");
 
-                            var filePathCombine = Path.Combine(currentDirectory, "Static", fileName);
+                            var filePath = Directory.GetFiles(currentDirectory, fileName + ".*").FirstOrDefault();
 
-                            if (!File.Exists(filePathCombine))
+                            if (string.IsNullOrEmpty(filePath))
                             {
+                                await context.Response.WriteAsync($"No files with name '{fileName}'");
                                 return;
                             }
 
-                            var file = await File.ReadAllBytesAsync(filePathCombine);
+                            var file = await File.ReadAllBytesAsync(filePath);
 
                             Console.WriteLine($"Returning content file length: {file.Length}");
 
@@ -81,6 +84,7 @@ namespace Gateway
 
 
             var router = new Router("routes.json");
+
             app.Run(async (context) =>
             {
                 var content = await router.RouteRequest(context.Request);

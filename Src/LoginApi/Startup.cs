@@ -1,4 +1,3 @@
-using System.Text;
 using LoginApi.Context;
 using LoginApi.Models;
 using LoginApi.Services;
@@ -13,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+using static Common.Storages.StringStorage;
 
 namespace LoginApi
 {
@@ -31,7 +32,7 @@ namespace LoginApi
             services.AddControllers();
 
             services.AddDbContext<LoginDbContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("MyConnectionString")));
+                options.UseSqlServer(_configuration.GetConnectionString("UsersDb")));
 
 
             services.Configure<IdentityOptions>(options =>
@@ -54,7 +55,7 @@ namespace LoginApi
 
             services.AddSingleton<JwtService>();
 
-            var secret = _configuration.GetSection("JwtConfig" + ":Secret").Value;
+            var secret = _configuration.GetSection(SecretSectionName).Value;
 
             var key = Encoding.ASCII.GetBytes(secret);
 
@@ -97,7 +98,7 @@ namespace LoginApi
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Hello LoginApi!");
+                    await context.Response.WriteAsync("Hello Login!");
                 });
                 endpoints.MapControllers();
             });

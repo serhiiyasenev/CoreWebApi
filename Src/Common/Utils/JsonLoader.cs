@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Gateway.Utils
+namespace Common.Utils
 {
     public class JsonLoader
     {

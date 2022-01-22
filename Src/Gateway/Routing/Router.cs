@@ -1,4 +1,4 @@
-﻿using Gateway.Utils;
+﻿using Common.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -42,8 +42,15 @@ namespace Gateway.Routing
 
             if (destination.RequiresAuthentication)
             {
-                string token = request.Headers["token"];
-                request.Query.Append(new KeyValuePair<string, StringValues>("token", new StringValues(token)));
+                var token = request.Headers["token"];
+                var keyValuePairs = request.Query.Append(new KeyValuePair<string, StringValues>("token", token));
+                keyValuePairs.ToList().ForEach(e =>
+                {
+                    // just to test
+                    var (key, value) = e;
+                    var result = string.Join(';', key, value);
+                    Console.WriteLine(result);
+                });
                 var authResponse = await AuthenticationService.SendRequest(request);
                 if (!authResponse.IsSuccessStatusCode) return ConstructErrorMessage("Authentication failed.");
             }

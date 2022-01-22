@@ -25,8 +25,7 @@ namespace LoginApi.Controllers
         }
 
         [HttpPost("token", Name = nameof(GetToken))]
-        public async Task<IActionResult> GetToken([FromForm] string username,
-                                                  [FromForm] string password)
+        public async Task<IActionResult> GetToken([FromForm] string username, [FromForm] string password)
         {
             // Go To Identity Server
 
@@ -53,7 +52,7 @@ namespace LoginApi.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Wrong request '{e.Message}': {e.InnerException}");
+                return BadRequest($"Wrong request '{e.Message}': {e.InnerException}; {e.InnerException?.Message}");
             }
 
         }

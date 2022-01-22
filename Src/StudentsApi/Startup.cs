@@ -7,8 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StudentsApi.Contexts;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace StudentsApi
 {
@@ -27,7 +25,7 @@ namespace StudentsApi
             services.AddControllers();
 
             services.AddDbContext<StudentsDbContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("MyConnectionString")));
+                options.UseSqlServer(_configuration.GetConnectionString("StudentsDb")));
 
             services.AddSwaggerGen(swagger =>
             {
@@ -63,7 +61,7 @@ namespace StudentsApi
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Login API");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Students API");
             });
 
         }
