@@ -41,27 +41,32 @@ namespace StudentsApiTest.IntegrationTests
         [Test]
         public async Task PostStudentModel_ReturnsResultAndOk()
         {
+            // Arrange
+            var postStudents = await _client.PostAsync(_requestUri, _content);
+
             // Act
-            var actualResult = await _client.PostAsync(_requestUri, _content);
-            var response = await actualResult.GetModelAsync<StudentEntity>();
+            var actualResult = await postStudents.GetModelAsync<StudentEntity>();
 
             // Assert
-            Assert.True(response.Id != 0);
-            Assert.True(response.Id.ToString() != null);
-            Assert.AreEqual(response.Name, _model.Name);
-            Assert.AreEqual(response.Disciplines.Select(d => d.Name), _model.Disciplines);
+            Assert.True(actualResult.Id != 0);
+            Assert.True(actualResult.Id.ToString() != null);
+            Assert.AreEqual(actualResult.Name, _model.Name);
+            Assert.AreEqual(actualResult.Disciplines.Select(d => d.Name), _model.Disciplines);
         }
 
         [Test]
         public async Task GetStudentModel_ReturnsResultAndOk()
         {
+            // Arrange 
+            var getStudents = await _client.GetAsync(_requestUri);
+            var response = await getStudents.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+
             // Act
-            var result = await _client.GetAsync(_requestUri);
-            var response = JsonHelper.FromJsonToObject<List<StudentModel>>(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
+            var actualResult = JsonHelper.FromJsonToObject<List<StudentModel>>(response);
 
             // Assert
-            Assert.AreEqual(response.Last().Name, _model.Name);
-            Assert.AreEqual(response.Last().Disciplines, _model.Disciplines);
+            Assert.AreEqual(actualResult.Last().Name, _model.Name);
+            Assert.AreEqual(actualResult.Last().Disciplines, _model.Disciplines);
         }
 
         [OneTimeTearDown]

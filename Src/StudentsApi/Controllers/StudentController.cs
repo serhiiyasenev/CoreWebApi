@@ -59,7 +59,6 @@ namespace StudentsApi.Controllers
                                                       .Include(d => d.Disciplines)
                                                       .FirstOrDefaultAsync(st => st.Id.Equals(id));
 
-
                 if (entity == null)
                 {
                     return NotFound();
@@ -70,7 +69,6 @@ namespace StudentsApi.Controllers
                     Name = entity.Name,
                     Disciplines = entity.Disciplines.Select(d => d.Name).ToHashSet()
                 };
-
 
                 var outboundModel = JsonHelper.FromObjectToJson(student);
 
@@ -99,17 +97,17 @@ namespace StudentsApi.Controllers
                     disciplines.Add(new DisciplineEntity{ Name = d});
                 }
 
+                var studentToAdd = new StudentEntity
+                {
+                    Name = inboundModel.Name,
+                    Disciplines = disciplines
+                };
 
-                var student = _dbContext.Students.Add(
-                    new StudentEntity
-                    {
-                        Name = inboundModel.Name,
-                        Disciplines = disciplines
-                    });
-                
+                var studentEntity = await _dbContext.Students.AddAsync(studentToAdd);
+
                 await _dbContext.SaveChangesAsync();
                 
-                return Ok(student.Entity);
+                return Created(studentEntity.Entity.Id.ToString(), studentEntity.Entity);
             }
             catch (Exception e)
             {
