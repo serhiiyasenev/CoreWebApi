@@ -31,6 +31,9 @@ namespace Gateway.Routing
 
             using var newRequest = new HttpRequestMessage(new HttpMethod(request.Method), CreateDestinationUri(request));
             newRequest.Content = new StringContent(requestContent, Encoding.UTF8, request.ContentType);
+
+            // Note: Response is not disposed here - ownership is transferred to caller
+            // The caller must dispose of the returned HttpResponseMessage
             var response = await Client.SendAsync(newRequest);
             return response;
         }
