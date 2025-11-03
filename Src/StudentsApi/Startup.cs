@@ -20,7 +20,8 @@ namespace StudentsApi
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            if (env != null)
+            // Register DbContext for all environments except Testing (where test infrastructure provides in-memory DB)
+            if (env != "Testing")
             {
                 services.AddDbContext<StudentsDbContext>(options =>
                     options.UseSqlServer(configuration.GetConnectionString("StudentsDb")));

@@ -50,7 +50,7 @@ namespace Gateway.Routing
                     var result = string.Join(';', key, value);
                     Console.WriteLine(result);
                 });
-                var authResponse = await AuthenticationService.SendRequest(request);
+                using var authResponse = await AuthenticationService.SendRequest(request);
                 if (!authResponse.IsSuccessStatusCode) return ConstructErrorMessage("Authentication failed.");
             }
 

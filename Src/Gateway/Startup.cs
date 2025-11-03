@@ -37,7 +37,7 @@ namespace Gateway
             app.MapWhen(context => context.Request.Path is { Value: not null, HasValue: true }
                                    && context.Request.Path.Value.StartsWith("/static/"),
                 appBuilder =>
-                { 
+                {
                     appBuilder.Run(async context =>
                     {
                         if (context.Request.Path.Value != null)
@@ -81,7 +81,7 @@ namespace Gateway
 
             app.Run(async (context) =>
             {
-                var content = await router.RouteRequest(context.Request);
+                using var content = await router.RouteRequest(context.Request);
                 await context.Response.WriteAsync(await content.Content.ReadAsStringAsync());
             });
 

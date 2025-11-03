@@ -47,6 +47,5 @@ namespace Gateway.Routing
 
             return Path + endpoint + queryString;
         }
-
     }
 }
