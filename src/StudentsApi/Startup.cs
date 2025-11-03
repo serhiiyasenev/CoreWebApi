@@ -20,7 +20,8 @@ namespace StudentsApi
             using var serviceProvider = services.BuildServiceProvider();
             var env = serviceProvider.GetRequiredService<IWebHostEnvironment>();
 
-            // Register DbContext for all environments except Testing (where test infrastructure provides in-memory DB)
+            // Register DbContext for all environments except Testing
+            // (where test infrastructure provides in-memory DB)
             if (env.EnvironmentName != "Testing")
             {
                 services.AddDbContext<StudentsDbContext>(options =>

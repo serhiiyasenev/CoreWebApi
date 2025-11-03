@@ -2,7 +2,6 @@ using Gateway.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -11,10 +10,8 @@ using System.Linq;
 
 namespace Gateway
 {
-    public class Startup(IConfiguration configuration)
+    public class Startup
     {
-        public IConfiguration Configuration { get; } = configuration;
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -34,45 +31,43 @@ namespace Gateway
 
             app.UseStaticFiles();
 
-            app.MapWhen(context => context.Request.Path is { Value: not null, HasValue: true }
-                                   && context.Request.Path.Value.StartsWith("/static/"),
-                appBuilder =>
+            app.MapWhen(context => context.Request.Path is { Value: not null, HasValue: true } && context.Request.Path.Value.StartsWith("/static/"), appBuilder =>
+            {
+                appBuilder.Run(async context =>
                 {
-                    appBuilder.Run(async context =>
+                    if (context.Request.Path.Value != null)
                     {
-                        if (context.Request.Path.Value != null)
+                        var fileName = context.Request.Path.Value["/static/".Length..];
+
+                        Console.WriteLine($"Returning content path: {fileName}");
+
+                        var currentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Static");
+
+                        string filePath = null;
+
+                        try
                         {
-                            var fileName = context.Request.Path.Value["/static/".Length..];
-
-                            Console.WriteLine($"Returning content path: {fileName}");
-
-                            var currentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Static");
-
-                            string filePath = null;
-
-                            try
-                            {
-                                filePath = Directory.GetFiles(currentDirectory, fileName + ".*").FirstOrDefault();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
-
-                            if (string.IsNullOrEmpty(filePath))
-                            {
-                                await context.Response.WriteAsync($"No files with name '{fileName}'");
-                                return;
-                            }
-
-                            var file = await File.ReadAllBytesAsync(filePath);
-
-                            Console.WriteLine($"Returning content file length: {file.Length}");
-
-                            await context.Response.Body.WriteAsync(file);
+                            filePath = Directory.GetFiles(currentDirectory, fileName + ".*").FirstOrDefault();
                         }
-                    });
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+
+                        if (string.IsNullOrEmpty(filePath))
+                        {
+                            await context.Response.WriteAsync($"No files with name '{fileName}'");
+                            return;
+                        }
+
+                        var file = await File.ReadAllBytesAsync(filePath);
+
+                        Console.WriteLine($"Returning content file length: {file.Length}");
+
+                        await context.Response.Body.WriteAsync(file);
+                    }
                 });
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -91,7 +86,6 @@ namespace Gateway
                 using var content = await router.RouteRequest(context.Request);
                 await context.Response.WriteAsync(await content.Content.ReadAsStringAsync());
             });
-
         }
     }
 }

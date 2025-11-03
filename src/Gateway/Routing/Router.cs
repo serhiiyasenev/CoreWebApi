@@ -1,4 +1,4 @@
-﻿using Common.Utils;
+﻿using Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -15,13 +15,12 @@ namespace Gateway.Routing
         public List<Route> Routes { get; set; }
         public Destination AuthenticationService { get; set; }
 
-
         public Router(string routeConfigFilePath)
         {
-            var router = JsonLoader.LoadFromFile<dynamic>(routeConfigFilePath);
+            var router = JsonHelper.LoadFromFile<dynamic>(routeConfigFilePath);
 
-            Routes = JsonLoader.Deserialize<List<Route>>(Convert.ToString(router.routes));
-            AuthenticationService = JsonLoader.Deserialize<Destination>(Convert.ToString(router.authenticationService));
+            Routes = JsonHelper.Deserialize<List<Route>>(Convert.ToString(router.routes));
+            AuthenticationService = JsonHelper.Deserialize<Destination>(Convert.ToString(router.authenticationService));
         }
 
         public async Task<HttpResponseMessage> RouteRequest(HttpRequest request)
@@ -30,6 +29,7 @@ namespace Gateway.Routing
             var basePath = '/' + path.Split('/')[1];
 
             Destination destination;
+
             try
             {
                 destination = Routes.First(r => r.Endpoint.Equals(basePath)).Destination;
@@ -39,25 +39,26 @@ namespace Gateway.Routing
                 return ConstructErrorMessage("The path could not be found.");
             }
 
-            if (destination.RequiresAuthentication)
+            if (!destination.RequiresAuthentication) return await destination.SendRequest(request);
+
+            var token = request.Headers["token"];
+            var keyValuePairs = request.Query.Append(new KeyValuePair<string, StringValues>("token", token));
+            keyValuePairs.ToList().ForEach(e =>
             {
-                var token = request.Headers["token"];
-                var keyValuePairs = request.Query.Append(new KeyValuePair<string, StringValues>("token", token));
-                keyValuePairs.ToList().ForEach(e =>
-                {
-                    // just to test
-                    var (key, value) = e;
-                    var result = string.Join(';', key, value);
-                    Console.WriteLine(result);
-                });
-                using var authResponse = await AuthenticationService.SendRequest(request);
-                if (!authResponse.IsSuccessStatusCode) return ConstructErrorMessage("Authentication failed.");
-            }
+                // just to test
+                var (key, value) = e;
+                var result = string.Join(';', key, value);
+                Console.WriteLine(result);
+            });
+
+            using var authResponse = await AuthenticationService.SendRequest(request);
+
+            if (!authResponse.IsSuccessStatusCode) return ConstructErrorMessage("Authentication failed.");
 
             return await destination.SendRequest(request);
         }
 
-        private HttpResponseMessage ConstructErrorMessage(string error)
+        private static HttpResponseMessage ConstructErrorMessage(string error)
         {
             var errorMessage = new HttpResponseMessage
             {
@@ -66,6 +67,5 @@ namespace Gateway.Routing
             };
             return errorMessage;
         }
-
     }
 }

@@ -10,7 +10,7 @@ namespace Gateway.Routing
     {
         public string Path { get; set; } = uri;
         public bool RequiresAuthentication { get; set; } = requiresAuthentication;
-        private static readonly HttpClient Client = new HttpClient();
+        private static readonly HttpClient Client = new();
 
         public Destination(string path) : this(path, false)
         {

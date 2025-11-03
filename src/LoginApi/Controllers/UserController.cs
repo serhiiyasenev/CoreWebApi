@@ -1,5 +1,4 @@
 ﻿using LoginApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace LoginApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/user")]
     public class UserController(UserManager<MyUser> user) : ControllerBase

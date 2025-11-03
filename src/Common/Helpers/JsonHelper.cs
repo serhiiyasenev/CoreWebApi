@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 
@@ -28,6 +30,19 @@ namespace Common.Helpers
         public static StringContent ToStringContent(object content)
         {
             return new StringContent(FromObjectToJson(content), Encoding.UTF8, "application/json");
+        }
+
+        public static T LoadFromFile<T>(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            var json = reader.ReadToEnd();
+            var result = JsonConvert.DeserializeObject<T>(json);
+            return result;
+        }
+
+        public static T Deserialize<T>(object jsonObject)
+        {
+            return JsonConvert.DeserializeObject<T>(Convert.ToString(jsonObject) ?? string.Empty);
         }
     }
 }

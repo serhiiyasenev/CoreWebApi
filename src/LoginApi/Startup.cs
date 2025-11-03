@@ -29,18 +29,18 @@ namespace LoginApi
 
 
             services.Configure<IdentityOptions>(options =>
-                                                {
-                                                    options.Password.RequireLowercase = true;
-                                                    options.Password.RequireUppercase = true;
-                                                    options.Password.RequireNonAlphanumeric = false;
-                                                    options.Password.RequireDigit = true;
-                                                    options.Password.RequiredLength = 10;
-                                                });
+            {
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 10;
+            });
 
             services.Configure<PasswordHasherOptions>(option =>
-                                                      {
-                                                          option.IterationCount = 120000;
-                                                      });
+            {
+                option.IterationCount = 120000;
+            });
 
             services.AddIdentity<MyUser, IdentityRole>()
                     .AddEntityFrameworkStores<LoginDbContext>()
@@ -50,22 +50,22 @@ namespace LoginApi
 
             var secret = configuration.GetSection(SecretSectionName).Value;
 
-            var key = Encoding.ASCII.GetBytes(secret);
+            var key = Encoding.ASCII.GetBytes(secret!);
 
             services.AddAuthentication(configureOptions =>
-                                       {
-                                           configureOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                                           configureOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                                       })
-                    .AddJwtBearer(jwtBearerOptions =>
-                                  {
-                                      jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-                                      {
-                                          IssuerSigningKey = new SymmetricSecurityKey(key),
-                                          ValidateIssuer = false,
-                                          ValidateAudience = false
-                                      };
-                                  });
+            {
+                configureOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                configureOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(jwtBearerOptions =>
+            {
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             services.AddSwaggerGen(swagger =>
             {

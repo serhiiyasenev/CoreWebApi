@@ -36,14 +36,12 @@ namespace LoginApi.Controllers
 
                 var token = jwtService.GetToken(username);
 
-
                 return Ok(token);
             }
             catch (Exception e)
             {
                 return BadRequest($"Wrong request '{e.Message}': {e.InnerException}; {e.InnerException?.Message}");
             }
-
         }
     }
 }
