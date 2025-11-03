@@ -35,7 +35,6 @@ namespace StudentsApi
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, StudentsDbContext dbContext)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
