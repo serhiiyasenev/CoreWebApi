@@ -12,7 +12,6 @@ namespace Gateway.Routing
 {
     public class Router
     {
-
         public List<Route> Routes { get; set; }
         public Destination AuthenticationService { get; set; }
 

@@ -11,25 +11,17 @@ using System.Threading.Tasks;
 
 namespace StudentsApi.Controllers
 {
-    //[Authorize]
     [ApiController]
     [Route("api/student")]
 
-    public class StudentController : ControllerBase
+    public class StudentController(StudentsDbContext dbContext) : ControllerBase
     {
-        private readonly StudentsDbContext _dbContext;
-
-        public StudentController(StudentsDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
         [HttpGet(Name = nameof(GetAllStudents))]
         public async Task<IActionResult> GetAllStudents()
         {
             try
             {
-                var studentEntities = await _dbContext.Students.AsNoTracking()
+                var studentEntities = await dbContext.Students.AsNoTracking()
                                                     .Include(d => d.Disciplines)
                                                     .ToListAsync();
 
@@ -37,7 +29,7 @@ namespace StudentsApi.Controllers
                 => new StudentModel
                 {
                     Name = entity.Name,
-                    Disciplines = entity.Disciplines.Select(d => d.Name).ToHashSet<string>()
+                    Disciplines = entity.Disciplines
                 }).ToList();
 
                 var outboundModel = JsonHelper.FromObjectToJson(students);
@@ -55,7 +47,7 @@ namespace StudentsApi.Controllers
         {
             try
             {
-                var entity = await _dbContext.Students.AsNoTracking()
+                var entity = await dbContext.Students.AsNoTracking()
                                                       .Include(d => d.Disciplines)
                                                       .FirstOrDefaultAsync(st => st.Id.Equals(id));
 
@@ -67,7 +59,7 @@ namespace StudentsApi.Controllers
                 var student = new StudentModel
                 {
                     Name = entity.Name,
-                    Disciplines = entity.Disciplines.Select(d => d.Name).ToHashSet()
+                    Disciplines = entity.Disciplines
                 };
 
                 var outboundModel = JsonHelper.FromObjectToJson(student);
@@ -94,7 +86,7 @@ namespace StudentsApi.Controllers
 
                 foreach (var d in inboundModel.Disciplines)
                 {
-                    disciplines.Add(new DisciplineEntity{ Name = d});
+                    disciplines.Add(d);
                 }
 
                 var studentToAdd = new StudentEntity
@@ -103,9 +95,9 @@ namespace StudentsApi.Controllers
                     Disciplines = disciplines
                 };
 
-                var studentEntity = await _dbContext.Students.AddAsync(studentToAdd);
+                var studentEntity = await dbContext.Students.AddAsync(studentToAdd);
 
-                await _dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 
                 return Created(studentEntity.Entity.Id.ToString(), studentEntity.Entity);
             }
@@ -120,16 +112,16 @@ namespace StudentsApi.Controllers
         {
             try
             {
-                var student = await _dbContext.Students.FindAsync(id);
+                var student = await dbContext.Students.FindAsync(id);
 
                 if (student == null)
                 {
                     return NotFound();
                 }
 
-                _dbContext.Students.Remove(student);
+                dbContext.Students.Remove(student);
 
-                await _dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
                 return Ok($"Student with id {student.Id} and name {student.Name} was deleted");
             }

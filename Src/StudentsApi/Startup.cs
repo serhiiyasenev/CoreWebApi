@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,22 +11,20 @@ using StudentsApi.Contexts;
 
 namespace StudentsApi
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-
-        public Startup(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
             services.AddControllers();
 
-            services.AddDbContext<StudentsDbContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("StudentsDb")));
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (env != null)
+            {
+                services.AddDbContext<StudentsDbContext>(options =>
+                    options.UseSqlServer(configuration.GetConnectionString("StudentsDb")));
+            }
 
             services.AddSwaggerGen(swagger =>
             {
@@ -47,7 +46,7 @@ namespace StudentsApi
             app.UseAuthentication();
             app.UseAuthorization();
 
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context =>

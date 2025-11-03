@@ -1,13 +1,13 @@
-using Common.Helpers;
-using NUnit.Framework;
-using StudentsApi.Entities;
-using StudentsApi.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Common.Helpers;
+using NUnit.Framework;
+using StudentsApi.Entities;
+using StudentsApi.Models;
 
-namespace StudentsApiTest.IntegrationTests
+namespace StudentsApiTest
 {
     [TestFixture]
     public class StudentControllerTests
@@ -28,11 +28,11 @@ namespace StudentsApiTest.IntegrationTests
             _model = new StudentModel
             {
                 Name = "TestStudent1",
-                Disciplines = new HashSet<string>
-                {
-                    "Math",
-                    "Chemistry"
-                }
+                Disciplines =
+                [
+                    new DisciplineEntity { Name = "Math"},
+                    new DisciplineEntity { Name = "Chemistry"}
+                ]
             };
 
             _content = JsonHelper.ToStringContent(_model);
@@ -48,25 +48,31 @@ namespace StudentsApiTest.IntegrationTests
             var actualResult = await postStudents.GetModelAsync<StudentEntity>();
 
             // Assert
-            Assert.True(actualResult.Id != 0);
-            Assert.True(actualResult.Id.ToString() != null);
-            Assert.AreEqual(actualResult.Name, _model.Name);
-            Assert.AreEqual(actualResult.Disciplines.Select(d => d.Name), _model.Disciplines);
+            Assert.That(actualResult.Id != 0);
+            Assert.That(actualResult.Name, Is.EqualTo(_model.Name));
+            Assert.That(
+                actualResult.Disciplines.Select(d => d.Name),
+                Is.EquivalentTo(_model.Disciplines.Select(d => d.Name))
+            );
         }
 
         [Test]
         public async Task GetStudentModel_ReturnsResultAndOk()
         {
             // Arrange 
-            var getStudents = await _client.GetAsync(_requestUri);
-            var response = await getStudents.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+            await _client.PostAsync(_requestUri, _content);
 
             // Act
-            var actualResult = JsonHelper.FromJsonToObject<List<StudentModel>>(response);
+            var getStudents = await _client.GetAsync(_requestUri);
+            var studentsResult = await getStudents.GetModelAsync<List<StudentEntity>>();
+            var actualStudent = studentsResult.Last();
 
             // Assert
-            Assert.AreEqual(actualResult.Last().Name, _model.Name);
-            Assert.AreEqual(actualResult.Last().Disciplines, _model.Disciplines);
+            Assert.That(actualStudent.Name, Is.EqualTo(_model.Name));
+            Assert.That(
+                actualStudent.Disciplines.Select(d => d.Name),
+                Is.EquivalentTo(_model.Disciplines.Select(d => d.Name))
+            );
         }
 
         [OneTimeTearDown]

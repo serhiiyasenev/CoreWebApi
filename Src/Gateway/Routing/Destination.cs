@@ -6,26 +6,18 @@ using System.Threading.Tasks;
 
 namespace Gateway.Routing
 {
-    public class Destination
+    public class Destination(string uri, bool requiresAuthentication)
     {
-        public string Path { get; set; }
-        public bool RequiresAuthentication { get; set; }
+        public string Path { get; set; } = uri;
+        public bool RequiresAuthentication { get; set; } = requiresAuthentication;
         private static readonly HttpClient Client = new HttpClient();
-
-        public Destination(string uri, bool requiresAuthentication)
-        {
-            Path = uri;
-            RequiresAuthentication = requiresAuthentication;
-        }
 
         public Destination(string path) : this(path, false)
         {
         }
 
-        private Destination()
+        private Destination() : this("/", false)
         {
-            Path = "/";
-            RequiresAuthentication = false;
         }
 
         public async Task<HttpResponseMessage> SendRequest(HttpRequest request)
@@ -37,11 +29,9 @@ namespace Gateway.Routing
                 requestContent = await readStream.ReadToEndAsync();
             }
 
-            using var newRequest = new HttpRequestMessage(new HttpMethod(request.Method), CreateDestinationUri(request))
-            {
-                Content = new StringContent(requestContent, Encoding.UTF8, request.ContentType)
-            };
-            using var response = await Client.SendAsync(newRequest);
+            using var newRequest = new HttpRequestMessage(new HttpMethod(request.Method), CreateDestinationUri(request));
+            newRequest.Content = new StringContent(requestContent, Encoding.UTF8, request.ContentType);
+            var response = await Client.SendAsync(newRequest);
             return response;
         }
 
@@ -50,11 +40,10 @@ namespace Gateway.Routing
             var requestPath = request.Path.ToString();
             var queryString = request.QueryString.ToString();
 
-            var endpoint = "";
+            var endpoint = string.Empty;
             var endpointSplit = requestPath[1..].Split('/');
 
-            if (endpointSplit.Length > 1)
-                endpoint = endpointSplit[1];
+            if (endpointSplit.Length > 1) endpoint = endpointSplit[1];
 
             return Path + endpoint + queryString;
         }

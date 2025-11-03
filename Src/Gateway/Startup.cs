@@ -11,14 +11,9 @@ using System.Linq;
 
 namespace Gateway
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -39,8 +34,7 @@ namespace Gateway
 
             app.UseStaticFiles();
 
-            app.MapWhen(context => context.Request.Path.Value != null 
-                                   && context.Request.Path.HasValue 
+            app.MapWhen(context => context.Request.Path is { Value: not null, HasValue: true }
                                    && context.Request.Path.Value.StartsWith("/static/"),
                 appBuilder =>
                 { 

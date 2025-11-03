@@ -10,21 +10,14 @@ namespace LoginApi.Controllers
     [Authorize]
     [ApiController]
     [Route("api/user")]
-    public class UserController : ControllerBase
+    public class UserController(UserManager<MyUser> user) : ControllerBase
     {
-        private readonly UserManager<MyUser> _userManager;
-
-        public UserController(UserManager<MyUser> user)
-        {
-            _userManager = user;
-        }
-
         [HttpPost("createUser", Name = nameof(CreateUser))]
         public async Task<IActionResult> CreateUser([FromForm] string username, [FromForm] string lastName, [FromForm] string password)
         {
             try
             {
-                var result = await _userManager.CreateAsync(new MyUser
+                var result = await user.CreateAsync(new MyUser
                 {
                     UserName = username,
                     LastName = lastName

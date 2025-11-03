@@ -3,12 +3,8 @@ using StudentsApi.Entities;
 
 namespace StudentsApi.Contexts
 {
-    public class StudentsDbContext : DbContext
+    public class StudentsDbContext(DbContextOptions options) : DbContext(options)
     {
-        public StudentsDbContext(DbContextOptions options) : base(options)
-        {
-        }
-        
         public DbSet<StudentEntity> Students { get; set; }
         public DbSet<DisciplineEntity> Disciplines { get; set; }
 

@@ -9,23 +9,17 @@ using static Common.Storages.StringStorage;
 
 namespace LoginApi.Services
 {
-    public class JwtService
+    public class JwtService(IConfiguration configuration)
     {
-        private readonly byte[] _secret;
-        private readonly double _expirationSecond;
-
-        public JwtService(IConfiguration configuration)
-        {
-            _secret = Encoding.ASCII.GetBytes(configuration.GetSection(SecretSectionName).Value);
-            _expirationSecond = Convert.ToDouble(configuration.GetSection(ExpirationSectionName).Value);
-        }
+        private readonly byte[] _secret = Encoding.ASCII.GetBytes(configuration.GetSection(SecretSectionName).Value!);
+        private readonly double _expirationSecond = Convert.ToDouble(configuration.GetSection(ExpirationSectionName).Value);
 
         public TokenModel GetToken(string username)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] {new Claim("UserName", username)}),
+                Subject = new ClaimsIdentity([new Claim("UserName", username)]),
                 Expires = DateTime.UtcNow.AddSeconds(_expirationSecond),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature)
             };

@@ -4,11 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LoginApi.Context
 {
-    public class LoginDbContext : IdentityDbContext<MyUser>
+    public class LoginDbContext(DbContextOptions<LoginDbContext> options) : IdentityDbContext<MyUser>(options)
     {
-
-        public LoginDbContext(DbContextOptions<LoginDbContext> options) : base(options) { }
-
         public DbSet<MyUser> MyUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

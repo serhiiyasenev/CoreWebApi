@@ -17,22 +17,15 @@ using static Common.Storages.StringStorage;
 
 namespace LoginApi
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-
-        public Startup(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
             services.AddControllers();
 
             services.AddDbContext<LoginDbContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("UsersDb")));
+                options.UseSqlServer(configuration.GetConnectionString("UsersDb")));
 
 
             services.Configure<IdentityOptions>(options =>
@@ -55,7 +48,7 @@ namespace LoginApi
 
             services.AddSingleton<JwtService>();
 
-            var secret = _configuration.GetSection(SecretSectionName).Value;
+            var secret = configuration.GetSection(SecretSectionName).Value;
 
             var key = Encoding.ASCII.GetBytes(secret);
 
