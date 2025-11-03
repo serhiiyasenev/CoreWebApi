@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +17,14 @@ namespace StudentsApi
             services.AddMvc();
             services.AddControllers();
 
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            using var serviceProvider = services.BuildServiceProvider();
+            var env = serviceProvider.GetRequiredService<IWebHostEnvironment>();
 
             // Register DbContext for all environments except Testing (where test infrastructure provides in-memory DB)
-            if (env != "Testing")
+            if (env.EnvironmentName != "Testing")
             {
                 services.AddDbContext<StudentsDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("StudentsDb")));
+                options.UseSqlServer(configuration.GetConnectionString("StudentsDb")));
             }
 
             services.AddSwaggerGen(swagger =>
@@ -54,16 +54,11 @@ namespace StudentsApi
                 {
                     await context.Response.WriteAsync("Hello Students!");
                 });
-
-                endpoints.MapControllers();
-            });
+               endpoints.MapControllers();
+           });
 
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Students API");
-            });
-
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Students API"); });
         }
     }
 }
