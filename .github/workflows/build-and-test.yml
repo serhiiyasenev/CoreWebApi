@@ -21,13 +21,10 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Restore dependencies
-      working-directory: ./CoreWebApi
-      run: dotnet restore CoreWebApp.sln
+      run: dotnet restore ./CoreWebApi/CoreWebApp.sln
 
     - name: Build solution
-      working-directory: ./CoreWebApi
-      run: dotnet build CoreWebApp.sln --configuration Release --no-restore
+      run: dotnet build ./CoreWebApi/CoreWebApp.sln --configuration Release --no-restore
 
     - name: Run tests
-      working-directory: ./CoreWebApi
-      run: dotnet test CoreWebApp.sln --configuration Release --no-build --verbosity normal
+      run: dotnet test ./CoreWebApi/CoreWebApp.sln --configuration Release --no-build --verbosity normal
