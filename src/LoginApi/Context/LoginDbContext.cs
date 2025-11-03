@@ -10,11 +10,9 @@ namespace LoginApi.Context
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-
             base.OnModelCreating(builder);
 
             builder.Entity<MyUser>().HasKey(user => user.Id);
         }
-
     }
 }

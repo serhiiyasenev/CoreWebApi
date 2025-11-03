@@ -48,7 +48,16 @@ namespace Gateway
 
                             var currentDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Static");
 
-                            var filePath = Directory.GetFiles(currentDirectory, fileName + ".*").FirstOrDefault();
+                            string filePath = null;
+
+                            try
+                            {
+                                filePath = Directory.GetFiles(currentDirectory, fileName + ".*").FirstOrDefault();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
 
                             if (string.IsNullOrEmpty(filePath))
                             {
@@ -75,11 +84,9 @@ namespace Gateway
                 endpoints.MapControllers();
             });
 
-
-
             var router = new Router("routes.json");
 
-            app.Run(async (context) =>
+            app.Run(async context =>
             {
                 using var content = await router.RouteRequest(context.Request);
                 await context.Response.WriteAsync(await content.Content.ReadAsStringAsync());

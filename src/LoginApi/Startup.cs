@@ -71,8 +71,6 @@ namespace LoginApi
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "Login API" });
             });
-
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LoginDbContext dbContext)
