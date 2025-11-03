@@ -38,11 +38,18 @@ namespace StudentsApiTest
                     options.UseInMemoryDatabase("StudentsTestDb");
                 });
 
-                using var sp = services.BuildServiceProvider();
-                using var scope = sp.CreateScope();
+                // Database initialization moved to CreateHost override.
+            });
+        }
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            var host = base.CreateHost(builder);
+            using (var scope = host.Services.CreateScope())
+            {
                 var db = scope.ServiceProvider.GetRequiredService<StudentsDbContext>();
                 db.Database.EnsureCreated();
-            });
+            }
+            return host;
         }
     }
 }
