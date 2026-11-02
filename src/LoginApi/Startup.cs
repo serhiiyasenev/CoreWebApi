@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
 using static Common.Storages.StringStorage;
 
@@ -49,8 +50,15 @@ namespace LoginApi
             services.AddSingleton<JwtService>();
 
             var secret = configuration.GetSection(SecretSectionName).Value;
+            var issuer = configuration["JwtConfig:Issuer"];
+            var audience = configuration["JwtConfig:Audience"];
 
-            var key = Encoding.ASCII.GetBytes(secret!);
+            if (string.IsNullOrWhiteSpace(secret) || Encoding.UTF8.GetByteCount(secret) < 32)
+                throw new InvalidOperationException("Configure a JWT signing secret of at least 32 bytes outside source control.");
+            if (string.IsNullOrWhiteSpace(issuer) || string.IsNullOrWhiteSpace(audience))
+                throw new InvalidOperationException("Configure JwtConfig:Issuer and JwtConfig:Audience.");
+
+            var key = Encoding.UTF8.GetBytes(secret);
 
             services.AddAuthentication(configureOptions =>
             {
@@ -62,8 +70,15 @@ namespace LoginApi
                 jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidIssuer = issuer,
+                    ValidateAudience = true,
+                    ValidAudience = audience,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true,
+                    RequireSignedTokens = true,
+                    ClockSkew = TimeSpan.FromSeconds(30)
                 };
             });
 
